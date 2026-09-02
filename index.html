@@ -147,13 +147,13 @@
   }
   .stat-card .num{ font-size:28px; font-weight:600; line-height:1; font-family:'Newsreader', serif; }
   .stat-card .label{ font-size:12px; }
-  .stat-card.ok{ background:linear-gradient(150deg, rgba(194,160,234,.30), rgba(255,255,255,.85)); }
+  .stat-card.ok{ background:linear-gradient(150deg, rgba(194,160,234,.42), rgba(255,255,255,.62)); }
   .stat-card.ok .num{ color:var(--lav-hot); }
   .stat-card.ok .label{ color:var(--ink-soft); }
-  .stat-card.warn{ background:linear-gradient(150deg, rgba(240,195,107,.32), rgba(255,255,255,.85)); }
+  .stat-card.warn{ background:linear-gradient(150deg, rgba(240,195,107,.46), rgba(255,255,255,.62)); }
   .stat-card.warn .num{ color:var(--warn); }
   .stat-card.warn .label{ color:var(--ink-soft); }
-  .stat-card.bad{ background:linear-gradient(150deg, rgba(240,160,201,.36), rgba(255,255,255,.85)); }
+  .stat-card.bad{ background:linear-gradient(150deg, rgba(240,160,201,.5), rgba(255,255,255,.62)); }
   .stat-card.bad .num{ color:var(--pink-hot); }
   .stat-card.bad .label{ color:var(--ink-soft); }
   .scroll-hint{
@@ -163,7 +163,7 @@
 
   /* ---------- Grid ---------- */
   main{ max-width:1080px; margin:0 auto; padding:26px 20px 0; position:relative; z-index:2; }
-  .grid-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; }
+  .grid-head{ display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:20px; }
   .grid-head h2{ font-family:'Newsreader', serif; font-weight:500; font-size:21px; margin:0; }
   .grid-head span{ font-size:13px; color:var(--ink-soft); }
 
@@ -175,7 +175,7 @@
   .card-wrap{ position:relative; }
   .card{
     position:relative; z-index:1;
-    background:rgba(255,255,255,.88); backdrop-filter:blur(8px);
+    background:rgba(255,255,255,.78); backdrop-filter:blur(8px);
     border:1px solid var(--line); border-radius:22px;
     padding:20px 20px 16px;
     cursor:pointer;
@@ -193,12 +193,18 @@
     background:radial-gradient(circle, var(--accent-a, var(--lav-mid)) 0%, transparent 70%);
     opacity:.22; pointer-events:none;
   }
-  .card-wrap:hover .card{
-    transform:translateY(-8px) rotateX(3deg) rotateY(-2deg) scale(1.012);
-    box-shadow:0 28px 44px -22px rgba(124,86,184,0.5), 0 0 0 1px rgba(203,179,236,0.6);
-    border-color:var(--lav-mid);
+  /* Hover-lift only for devices with a real hover + fine pointer (mouse/trackpad).
+     On touch screens this was firing on tap and getting stuck "on" because
+     touch devices don't send a hover-off event, which read as a permanent
+     bright highlight over the card. */
+  @media (hover:hover) and (pointer:fine){
+    .card-wrap:hover .card{
+      transform:translateY(-8px) rotateX(3deg) rotateY(-2deg) scale(1.012);
+      box-shadow:0 28px 44px -22px rgba(124,86,184,0.5), 0 0 0 1px rgba(203,179,236,0.6);
+      border-color:var(--lav-mid);
+    }
   }
-  .card:active{ transform:scale(0.985); }
+  .card:active{ transform:scale(0.985); background:rgba(255,255,255,.9); }
 
   .card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:14px; }
   .card .plate{
@@ -260,7 +266,9 @@
     box-shadow:var(--shadow-lift); cursor:pointer; z-index:40;
     transition:transform .15s ease;
   }
-  .fab:hover{ transform:scale(1.06); }
+  @media (hover:hover) and (pointer:fine){
+    .fab:hover{ transform:scale(1.06); }
+  }
   .fab:active{ transform:scale(0.94); }
 
   /* ---------- Modal / bottom sheet ---------- */
@@ -287,7 +295,9 @@
     background:var(--lav-pale); border:none; width:32px; height:32px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--lav-deep); flex-shrink:0;
   }
-  .close-btn:hover{ background:var(--lav-mid); color:#fff; }
+  @media (hover:hover) and (pointer:fine){
+    .close-btn:hover{ background:var(--lav-mid); color:#fff; }
+  }
 
   form{ margin-top:18px; display:flex; flex-direction:column; gap:14px; }
   .field{ display:flex; flex-direction:column; gap:6px; }
@@ -310,14 +320,18 @@
   .modal-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:6px; gap:10px; }
   .btn{
     font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14.5px; border-radius:13px;
-    padding:13px 20px; border:none; cursor:pointer; transition:background .15s ease, color .15s ease, transform .1s ease;
+    padding:13px 20px; border:none; cursor:pointer; transition:background .15s ease, color .15s ease, transform .1s ease, filter .15s ease;
   }
   .btn:active{ transform:scale(0.97); }
   .btn-primary{ background:linear-gradient(120deg, var(--lav-hot), var(--pink-hot)); color:#fff; flex:1; }
-  .btn-primary:hover{ filter:brightness(1.06); }
+  @media (hover:hover) and (pointer:fine){
+    .btn-primary:hover{ filter:brightness(1.06); }
+  }
   .btn-primary:disabled{ opacity:.6; cursor:default; }
   .btn-ghost{ background:transparent; color:var(--bad); padding:12px 4px; }
-  .btn-ghost:hover{ text-decoration:underline; }
+  @media (hover:hover) and (pointer:fine){
+    .btn-ghost:hover{ text-decoration:underline; }
+  }
 
   footer{
     max-width:1080px; margin:52px auto 0; padding:0 20px 36px;
@@ -337,6 +351,14 @@
     .field-row{ grid-template-columns:1fr; }
     .fab{ right:16px; width:56px; height:56px; }
 
+    /* Tone down the blobs/grain on small screens so the UI doesn't read
+       as a wash of bright white/pink behind the content. */
+    .mesh .blob{ filter:blur(50px); opacity:.5; }
+    .grain{ opacity:.02; }
+
+    .card{ background:rgba(255,255,255,.9); }
+    .stat-card{ backdrop-filter:none; }
+
     .overlay{ align-items:flex-end; padding:0; }
     .modal{
       max-width:100%; border-radius:26px 26px 0 0; padding:14px 20px calc(22px + env(safe-area-inset-bottom));
@@ -347,7 +369,6 @@
       display:block; width:40px; height:4px; border-radius:999px; background:var(--line);
       margin:2px auto 14px;
     }
-    .card-wrap:hover .card{ transform:none; box-shadow:0 12px 26px -18px rgba(124,86,184,0.4); }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -510,7 +531,11 @@
 </div>
 
 <script>
-  const API_URL = '/api/vehicles';
+  // Vehicles are stored under this single shared key so everyone with the
+  // link sees the same list. Storage values must be strings, so the whole
+  // array is JSON-encoded.
+  const STORAGE_KEY = 'vehicles';
+  const SHARED = true;
 
   const grid = document.getElementById('grid');
   const overlay = document.getElementById('overlay');
@@ -530,25 +555,42 @@
 
   let vehicles = [];
 
-  // ---------- API helpers ----------
+  // ---------- Storage helpers ----------
+  // Reading a key that has never been set throws, rather than returning
+  // null, so an empty list is treated as "not created yet" and handled here.
+  async function loadVehicles(){
+    try{
+      const result = await window.storage.get(STORAGE_KEY, SHARED);
+      if(!result || !result.value) return [];
+      const parsed = JSON.parse(result.value);
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(err){
+      return [];
+    }
+  }
+
+  async function saveVehicles(list){
+    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(list), SHARED);
+    if(!result) throw new Error('Could not save — please try again.');
+    return list;
+  }
+
   async function apiGet(){
-    const res = await fetch(API_URL);
-    if(!res.ok) throw new Error('Could not load vehicles (' + res.status + ')');
-    return res.json();
+    return loadVehicles();
   }
+
   async function apiUpsert(vehicle){
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(vehicle)
-    });
-    if(!res.ok) throw new Error('Could not save vehicle (' + res.status + ')');
-    return res.json();
+    const list = await loadVehicles();
+    const idx = list.findIndex(v => v.id === vehicle.id);
+    if(idx >= 0) list[idx] = vehicle;
+    else list.push(vehicle);
+    return saveVehicles(list);
   }
+
   async function apiDelete(id){
-    const res = await fetch(API_URL + '?id=' + encodeURIComponent(id), { method: 'DELETE' });
-    if(!res.ok) throw new Error('Could not delete vehicle (' + res.status + ')');
-    return res.json();
+    const list = await loadVehicles();
+    const next = list.filter(v => v.id !== id);
+    return saveVehicles(next);
   }
 
   function daysUntil(dateStr){
