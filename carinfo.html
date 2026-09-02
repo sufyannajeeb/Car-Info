@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Vault — Vehicle Document Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFF7FB;
+    --panel:#FFFFFF;
+    --pink-pale:#FDE3F0;
+    --pink-mid:#F0A0C9;
+    --pink-deep:#D4568C;
+    --pink-hot:#E8447D;
+    --lav-pale:#ECDEF9;
+    --lav-mid:#C2A0EA;
+    --lav-deep:#7C56B8;
+    --lav-hot:#6A3FD1;
+    --gold-mid:#F0C36B;
+    --ink:#3A2E48;
+    --ink-soft:#8D7F9C;
+    --line:#F1DEEC;
+    --good:#2F8F5B;
+    --good-bg:#E1F5EA;
+    --warn:#B4791E;
+    --warn-bg:#FCEFD3;
+    --bad:#C24473;
+    --bad-bg:#FCE0EC;
+    --shadow-lift: 0 20px 46px -18px rgba(124, 86, 184, 0.4);
+    --shadow-soft: 0 8px 22px -14px rgba(212, 86, 140, 0.32);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    position:relative;
+    background:
+      radial-gradient(ellipse 900px 500px at 8% 0%, rgba(240,160,201,0.28), transparent 60%),
+      radial-gradient(ellipse 800px 600px at 100% 20%, rgba(194,160,234,0.30), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 20% 100%, rgba(240,195,107,0.14), transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100vh;
+    padding-bottom:140px;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--lav-mid); color:#fff;}
+
+  /* ---------- Mesh / blob background ---------- */
+  .mesh{
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  .mesh .blob{
+    position:absolute; border-radius:50%;
+    filter:blur(70px);
+    opacity:.75;
+    animation:drift 26s ease-in-out infinite;
+  }
+  .mesh .b1{width:460px;height:460px; top:-170px; right:-130px; background:radial-gradient(circle, var(--pink-hot), transparent 72%); animation-duration:24s;}
+  .mesh .b2{width:420px;height:420px; top:16%; left:-180px; background:radial-gradient(circle, var(--lav-hot), transparent 72%); animation-duration:30s; animation-delay:-6s;}
+  .mesh .b3{width:380px;height:380px; bottom:-150px; right:6%; background:radial-gradient(circle, var(--pink-mid), transparent 72%); animation-duration:22s; animation-delay:-11s;}
+  .mesh .b4{width:340px;height:340px; bottom:14%; left:18%; background:radial-gradient(circle, var(--lav-mid), transparent 72%); animation-duration:28s; animation-delay:-4s;}
+  .mesh .b5{width:260px;height:260px; top:42%; left:46%; background:radial-gradient(circle, var(--gold-mid), transparent 72%); animation-duration:32s; animation-delay:-14s; opacity:.4;}
+  @keyframes drift{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(24px,-30px) scale(1.08); }
+  }
+
+  .grain{
+    position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.035; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- Ambient rising floaters ---------- */
+  .floaters{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
+  .floaters span{
+    position:absolute; bottom:-70px; opacity:0;
+    animation-name:rise; animation-timing-function:ease-in-out; animation-iteration-count:infinite;
+    will-change:transform, opacity;
+  }
+  @keyframes rise{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0; }
+    8%{ opacity:.7; }
+    50%{ transform:translateY(-55vh) translateX(18px) rotate(8deg); }
+    92%{ opacity:.4; }
+    100%{ transform:translateY(-112vh) translateX(-14px) rotate(-6deg); opacity:0; }
+  }
+  .f1{left:6%;  animation-duration:22s; animation-delay:0s;}
+  .f2{left:18%; animation-duration:26s; animation-delay:-6s;}
+  .f3{left:32%; animation-duration:19s; animation-delay:-12s;}
+  .f4{left:48%; animation-duration:30s; animation-delay:-3s;}
+  .f5{left:64%; animation-duration:24s; animation-delay:-16s;}
+  .f6{left:78%; animation-duration:20s; animation-delay:-9s;}
+  .f7{left:90%; animation-duration:28s; animation-delay:-20s;}
+
+  /* ---------- Header ---------- */
+  header{
+    max-width:1080px; margin:0 auto; padding:44px 20px 26px;
+    position:relative; z-index:2;
+  }
+  .eyebrow-row{
+    display:inline-flex; align-items:center; gap:9px;
+    color:var(--lav-hot); font-size:13px; font-weight:600;
+    margin-bottom:20px;
+    padding:6px 14px 6px 10px;
+    background:linear-gradient(120deg, rgba(240,160,201,.24), rgba(194,160,234,.30));
+    border:1px solid var(--lav-mid);
+    border-radius:999px;
+    backdrop-filter:blur(6px);
+    opacity:0; animation:riseIn .6s ease forwards;
+  }
+  h1{
+    font-family:'Newsreader', serif; font-weight:500;
+    font-size:clamp(30px, 6vw, 50px); line-height:1.08;
+    margin:0 0 14px; max-width:16ch;
+    background:linear-gradient(100deg, var(--ink) 30%, var(--pink-hot) 62%, var(--lav-hot) 92%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    opacity:0; animation:riseIn .7s ease .08s forwards;
+  }
+  .lede{
+    font-size:15.5px; color:var(--ink-soft); max-width:50ch; line-height:1.6; margin:0;
+    opacity:0; animation:riseIn .7s ease .16s forwards;
+  }
+  .share-note{
+    margin-top:16px; font-size:12.5px; color:var(--lav-hot); font-weight:600;
+    display:inline-flex; align-items:center; gap:6px;
+    opacity:0; animation:riseIn .7s ease .22s forwards;
+  }
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
+
+  /* ---------- Stat carousel ---------- */
+  .stats-wrap{ position:relative; z-index:2; max-width:1080px; margin:6px auto 0; padding:0 20px; }
+  .stats{
+    display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x proximity;
+    padding:2px 2px 10px; -ms-overflow-style:none; scrollbar-width:none;
+  }
+  .stats::-webkit-scrollbar{ display:none; }
+  .stat-card{
+    scroll-snap-align:start; flex:0 0 auto; min-width:158px;
+    backdrop-filter:blur(10px);
+    border:1px solid var(--line); border-radius:18px; padding:16px 18px;
+    display:flex; flex-direction:column; gap:4px; box-shadow:var(--shadow-soft);
+  }
+  .stat-card .num{ font-size:28px; font-weight:600; line-height:1; font-family:'Newsreader', serif; }
+  .stat-card .label{ font-size:12px; }
+  .stat-card.ok{ background:linear-gradient(150deg, rgba(194,160,234,.30), rgba(255,255,255,.85)); }
+  .stat-card.ok .num{ color:var(--lav-hot); }
+  .stat-card.ok .label{ color:var(--ink-soft); }
+  .stat-card.warn{ background:linear-gradient(150deg, rgba(240,195,107,.32), rgba(255,255,255,.85)); }
+  .stat-card.warn .num{ color:var(--warn); }
+  .stat-card.warn .label{ color:var(--ink-soft); }
+  .stat-card.bad{ background:linear-gradient(150deg, rgba(240,160,201,.36), rgba(255,255,255,.85)); }
+  .stat-card.bad .num{ color:var(--pink-hot); }
+  .stat-card.bad .label{ color:var(--ink-soft); }
+  .scroll-hint{
+    display:none; align-items:center; gap:4px; font-size:11px; color:var(--ink-soft);
+    padding-left:2px; margin-top:2px;
+  }
+
+  /* ---------- Grid ---------- */
+  main{ max-width:1080px; margin:0 auto; padding:26px 20px 0; position:relative; z-index:2; }
+  .grid-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; }
+  .grid-head h2{ font-family:'Newsreader', serif; font-weight:500; font-size:21px; margin:0; }
+  .grid-head span{ font-size:13px; color:var(--ink-soft); }
+
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    gap:22px; perspective:1400px;
+  }
+
+  .card-wrap{ position:relative; }
+  .card{
+    position:relative; z-index:1;
+    background:rgba(255,255,255,.88); backdrop-filter:blur(8px);
+    border:1px solid var(--line); border-radius:22px;
+    padding:20px 20px 16px;
+    cursor:pointer;
+    transform-style:preserve-3d;
+    transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .2s ease;
+    overflow:hidden;
+    box-shadow:0 12px 26px -18px rgba(124,86,184,0.4);
+  }
+  .card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:6px;
+    background:linear-gradient(90deg, var(--accent-a, var(--lav-mid)), var(--accent-b, var(--pink-mid)));
+  }
+  .card::after{
+    content:""; position:absolute; top:-55%; right:-25%; width:200px; height:200px;
+    background:radial-gradient(circle, var(--accent-a, var(--lav-mid)) 0%, transparent 70%);
+    opacity:.22; pointer-events:none;
+  }
+  .card-wrap:hover .card{
+    transform:translateY(-8px) rotateX(3deg) rotateY(-2deg) scale(1.012);
+    box-shadow:0 28px 44px -22px rgba(124,86,184,0.5), 0 0 0 1px rgba(203,179,236,0.6);
+    border-color:var(--lav-mid);
+  }
+  .card:active{ transform:scale(0.985); }
+
+  .card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:14px; }
+  .card .plate{
+    display:inline-flex; align-items:center; gap:6px;
+    font-weight:600; font-size:12.5px; letter-spacing:0.02em; color:var(--lav-deep);
+    background:var(--lav-pale); border:1px solid var(--lav-mid);
+    padding:4px 10px 4px 8px; border-radius:8px;
+  }
+  .status-ring{
+    position:relative; width:44px; height:44px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .status-ring::before{
+    content:""; position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(var(--ring-stops));
+  }
+  .status-ring::after{
+    content:""; position:absolute; inset:5px; border-radius:50%; background:var(--panel);
+  }
+  .status-ring span{ position:relative; z-index:1; font-size:11px; font-weight:700; color:var(--ink); }
+
+  .card h3{ font-family:'Newsreader', serif; font-weight:500; font-size:19px; margin:0 0 2px; }
+  .card .sub{ font-size:12px; color:var(--ink-soft); margin-bottom:14px; }
+
+  .doc-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 0; border-top:1px solid var(--line); font-size:13px;
+  }
+  .doc-row .doc-name{ color:var(--ink-soft); display:flex; align-items:center; gap:6px; }
+  .doc-row .doc-date{ font-weight:600; }
+  .pill{ font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .pill.good{ color:var(--good); background:var(--good-bg); }
+  .pill.warn{ color:var(--warn); background:var(--warn-bg); }
+  .pill.bad{ color:var(--bad); background:var(--bad-bg); }
+
+  .empty{
+    grid-column:1/-1; text-align:center; padding:60px 20px;
+    border:1.5px dashed var(--lav-mid); border-radius:22px;
+    background:linear-gradient(160deg, rgba(194,160,234,.16), rgba(240,160,201,.14));
+    backdrop-filter:blur(8px);
+  }
+  .empty h3{ font-family:'Newsreader', serif; font-weight:500; font-size:21px; margin:0 0 8px; }
+  .empty p{ color:var(--ink-soft); font-size:14px; margin:0 0 20px; }
+
+  .load-state{
+    grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--ink-soft); font-size:14px;
+  }
+  .error-banner{
+    grid-column:1/-1; text-align:center; padding:16px 20px; border-radius:16px;
+    background:var(--bad-bg); color:var(--bad); font-size:13px; font-weight:600;
+  }
+
+  /* ---------- Floating add button ---------- */
+  .fab{
+    position:fixed; right:22px; bottom:calc(22px + env(safe-area-inset-bottom));
+    width:60px; height:60px; border-radius:50%;
+    background:linear-gradient(135deg, var(--lav-hot), var(--pink-hot));
+    color:#fff; border:none; display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--shadow-lift); cursor:pointer; z-index:40;
+    transition:transform .15s ease;
+  }
+  .fab:hover{ transform:scale(1.06); }
+  .fab:active{ transform:scale(0.94); }
+
+  /* ---------- Modal / bottom sheet ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(58,46,72,0.42); backdrop-filter:blur(3px);
+    display:flex; align-items:center; justify-content:center; padding:20px; z-index:60;
+    opacity:0; pointer-events:none; transition:opacity .18s ease;
+  }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+
+  .modal{
+    background:var(--panel); width:100%; max-width:460px;
+    border-radius:24px; border:1px solid var(--line); box-shadow:var(--shadow-lift);
+    padding:26px 24px 22px; max-height:88vh; overflow-y:auto;
+    transform:translateY(14px) scale(.98); transition:transform .22s cubic-bezier(.2,.8,.2,1);
+  }
+  .overlay.open .modal{ transform:translateY(0) scale(1); }
+  .sheet-handle{ display:none; }
+
+  .modal-head{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px; }
+  .modal-head h2{ font-family:'Newsreader', serif; font-weight:500; font-size:22px; margin:0; }
+  .modal-head p{ margin:4px 0 0; color:var(--ink-soft); font-size:13px; }
+  .close-btn{
+    background:var(--lav-pale); border:none; width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--lav-deep); flex-shrink:0;
+  }
+  .close-btn:hover{ background:var(--lav-mid); color:#fff; }
+
+  form{ margin-top:18px; display:flex; flex-direction:column; gap:14px; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:12.5px; color:var(--ink-soft); font-weight:500; }
+  .field input, .field select{
+    font-family:'Space Grotesk', sans-serif; font-size:15px; padding:12px 13px;
+    border-radius:12px; border:1px solid var(--line); background:#FFFCFE; color:var(--ink);
+    outline:none; transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .field input:focus, .field select:focus{
+    border-color:var(--lav-deep); box-shadow:0 0 0 3px rgba(124,86,184,0.15);
+  }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .field-divider{ display:flex; align-items:center; gap:10px; margin-top:2px; color:var(--ink-soft); font-size:11.5px; }
+  .field-divider::before, .field-divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .addonly-note{ margin:2px 0 0; font-size:11.5px; color:var(--ink-soft); font-style:italic; }
+  .form-error{ font-size:12.5px; color:var(--bad); background:var(--bad-bg); padding:8px 12px; border-radius:10px; display:none; }
+  .form-error.show{ display:block; }
+
+  .modal-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:6px; gap:10px; }
+  .btn{
+    font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14.5px; border-radius:13px;
+    padding:13px 20px; border:none; cursor:pointer; transition:background .15s ease, color .15s ease, transform .1s ease;
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primary{ background:linear-gradient(120deg, var(--lav-hot), var(--pink-hot)); color:#fff; flex:1; }
+  .btn-primary:hover{ filter:brightness(1.06); }
+  .btn-primary:disabled{ opacity:.6; cursor:default; }
+  .btn-ghost{ background:transparent; color:var(--bad); padding:12px 4px; }
+  .btn-ghost:hover{ text-decoration:underline; }
+
+  footer{
+    max-width:1080px; margin:52px auto 0; padding:0 20px 36px;
+    color:var(--ink-soft); font-size:12px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+    position:relative; z-index:2;
+  }
+
+  /* ---------- Mobile-first refinements ---------- */
+  @media (max-width:640px){
+    body{ padding-bottom:110px; }
+    header{ padding:32px 16px 20px; }
+    .stats-wrap{ padding:0 16px; }
+    .scroll-hint{ display:flex; }
+    main{ padding:22px 16px 0; }
+    .grid{ grid-template-columns:1fr; gap:18px; }
+    .field-row{ grid-template-columns:1fr; }
+    .fab{ right:16px; width:56px; height:56px; }
+
+    .overlay{ align-items:flex-end; padding:0; }
+    .modal{
+      max-width:100%; border-radius:26px 26px 0 0; padding:14px 20px calc(22px + env(safe-area-inset-bottom));
+      max-height:92vh; transform:translateY(100%);
+    }
+    .overlay.open .modal{ transform:translateY(0); }
+    .sheet-handle{
+      display:block; width:40px; height:4px; border-radius:999px; background:var(--line);
+      margin:2px auto 14px;
+    }
+    .card-wrap:hover .card{ transform:none; box-shadow:0 12px 26px -18px rgba(124,86,184,0.4); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+    .eyebrow-row, h1, .lede, .share-note{ opacity:1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mesh" aria-hidden="true">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+  <div class="blob b5"></div>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="floaters" aria-hidden="true">
+  <span class="f1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 15h16M6 15l1.6-4.4A2 2 0 019.5 9h5a2 2 0 011.9 1.6L18 15" stroke="#7C56B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="17" r="1.6" fill="#7C56B8"/><circle cx="16" cy="17" r="1.6" fill="#7C56B8"/></svg></span>
+  <span class="f2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.7 5.3L19 9l-5.3 1.7L12 16l-1.7-5.3L5 9l5.3-1.7L12 2z" fill="#E8447D"/></svg></span>
+  <span class="f3"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z" stroke="#D4568C" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#D4568C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <span class="f4"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" fill="#ECDEF9" stroke="#C2A0EA" stroke-width="1.4"/></svg></span>
+  <span class="f5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#7C56B8" stroke-width="1.4"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#7C56B8" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+  <span class="f6"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4l2 4 4 .6-3 3 .7 4.4L12 14l-3.7 2-.7-4.4-3-3L8.5 8 12 4z" fill="#F0C36B"/></svg></span>
+  <span class="f7"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.6-9.3-9.1C1.2 8.4 3 5 6.4 5c2 0 3.4 1.2 4.1 2.4.7 1.3.9 1.9 1.5 1.9s.8-.6 1.5-1.9C14.2 6.2 15.6 5 17.6 5 21 5 22.8 8.4 21.3 11.9 19 16.4 12 21 12 21z" fill="#ECDEF9" stroke="#C2A0EA" stroke-width="1.2"/></svg></span>
+</div>
+
+<header>
+  <div class="eyebrow-row">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M3 12h18M3 12l3-6h12l3 6M3 12v6a1 1 0 001 1h1a1 1 0 001-1v-1h12v1a1 1 0 001 1h1a1 1 0 001-1v-6" stroke="#7C56B8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="7.5" cy="15.5" r="1.3" fill="#7C56B8"/>
+      <circle cx="16.5" cy="15.5" r="1.3" fill="#7C56B8"/>
+    </svg>
+    <span>Vault</span>
+  </div>
+  <h1>Every vehicle's paperwork, never a surprise renewal.</h1>
+  <p class="lede">Keep registration, insurance, pollution and fitness certificates in one place. Add a vehicle, set its expiry dates, and Vault tells you what's due before it lapses.</p>
+  <div class="share-note">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.6"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.6"/></svg>
+    Shared with anyone who has this link — there's no login.
+  </div>
+</header>
+
+<div class="stats-wrap">
+  <div class="stats" id="statsRow">
+    <div class="stat-card ok">
+      <div class="num" id="statTotal">0</div>
+      <div class="label">Vehicles tracked</div>
+    </div>
+    <div class="stat-card warn">
+      <div class="num" id="statSoon">0</div>
+      <div class="label">Expiring within 30 days</div>
+    </div>
+    <div class="stat-card bad">
+      <div class="num" id="statExpired">0</div>
+      <div class="label">Already expired</div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#8D7F9C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Swipe for more</span>
+  </div>
+</div>
+
+<main>
+  <div class="grid-head">
+    <h2>Your vehicles</h2>
+    <span id="countLabel"></span>
+  </div>
+  <div class="grid" id="grid">
+    <div class="load-state" id="loadState">Loading vehicles…</div>
+  </div>
+</main>
+
+<footer>
+  <span>Synced to a shared list — anyone with this link can view and edit it.</span>
+  <span id="lastSaved"></span>
+</footer>
+
+<button class="fab" id="fabAdd" aria-label="Add vehicle" title="Add vehicle">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+</button>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="sheet-handle"></div>
+    <div class="modal-head">
+      <div>
+        <h2 id="modalTitle">Add a vehicle</h2>
+        <p id="modalSub">Fill in the details below.</p>
+      </div>
+      <button class="close-btn" id="closeModal" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <form id="vehicleForm">
+      <input type="hidden" id="vehicleId">
+
+      <div class="field">
+        <label for="ownerName">Vehicle nickname</label>
+        <input type="text" id="ownerName" placeholder="e.g. Family SUV" required>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="plate">Registration number</label>
+          <input type="text" id="plate" placeholder="KL-07-AB-1234" required>
+        </div>
+        <div class="field">
+          <label for="vType">Type</label>
+          <select id="vType">
+            <option>Car</option>
+            <option>Bike</option>
+            <option>Truck</option>
+            <option>Auto</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-divider">Document expiry dates</div>
+
+      <div id="addOnlyFields">
+        <div class="field-row">
+          <div class="field">
+            <label for="registrationDate">Vehicle registration (RC) expiry</label>
+            <input type="date" id="registrationDate">
+          </div>
+          <div class="field">
+            <label for="fitnessDate">Fitness certificate expiry</label>
+            <input type="date" id="fitnessDate">
+          </div>
+        </div>
+        <p class="addonly-note">Set once when a vehicle is added — not editable afterwards.</p>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="insuranceDate">Insurance expiry</label>
+          <input type="date" id="insuranceDate" required>
+        </div>
+        <div class="field">
+          <label for="pollutionDate">Pollution certificate expiry</label>
+          <input type="date" id="pollutionDate" required>
+        </div>
+      </div>
+
+      <p class="form-error" id="formError"></p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="deleteBtn" style="display:none;">Delete vehicle</button>
+        <button type="submit" class="btn btn-primary" id="saveBtn">Save vehicle</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const API_URL = '/api/vehicles';
+
+  const grid = document.getElementById('grid');
+  const overlay = document.getElementById('overlay');
+  const form = document.getElementById('vehicleForm');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalSub = document.getElementById('modalSub');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const formError = document.getElementById('formError');
+
+  const DOCS = [
+    { key: 'registrationDate', label: 'Registration (RC)' },
+    { key: 'insuranceDate',    label: 'Insurance' },
+    { key: 'pollutionDate',    label: 'Pollution cert.' },
+    { key: 'fitnessDate',      label: 'Fitness cert.' }
+  ];
+
+  let vehicles = [];
+
+  // ---------- API helpers ----------
+  async function apiGet(){
+    const res = await fetch(API_URL);
+    if(!res.ok) throw new Error('Could not load vehicles (' + res.status + ')');
+    return res.json();
+  }
+  async function apiUpsert(vehicle){
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(vehicle)
+    });
+    if(!res.ok) throw new Error('Could not save vehicle (' + res.status + ')');
+    return res.json();
+  }
+  async function apiDelete(id){
+    const res = await fetch(API_URL + '?id=' + encodeURIComponent(id), { method: 'DELETE' });
+    if(!res.ok) throw new Error('Could not delete vehicle (' + res.status + ')');
+    return res.json();
+  }
+
+  function daysUntil(dateStr){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const target = new Date(dateStr + 'T00:00:00');
+    return Math.round((target - today) / 86400000);
+  }
+
+  function statusFor(dateStr){
+    if(!dateStr) return {cls:'warn', label:'Not set'};
+    const d = daysUntil(dateStr);
+    if(d < 0) return {cls:'bad', label:'Expired ' + Math.abs(d) + 'd ago'};
+    if(d <= 30) return {cls:'warn', label: d===0 ? 'Due today' : 'Due in ' + d + 'd'};
+    return {cls:'good', label:'Valid'};
+  }
+
+  function worstStatus(list){
+    const order = {bad:0, warn:1, good:2};
+    return list.reduce((worst, s) => order[s.cls] < order[worst.cls] ? s : worst, list[0]);
+  }
+
+  function accentPairFor(cls){
+    if(cls==='bad') return ['#E8447D', '#F0A0C9'];
+    if(cls==='warn') return ['#F0C36B', '#F0A0C9'];
+    return ['#7C56B8', '#C2A0EA'];
+  }
+
+  function ringGradient(statuses){
+    const colorFor = { good:'#7C56B8', warn:'#B4791E', bad:'#E8447D' };
+    const n = statuses.length;
+    const step = 360 / n;
+    let stops = [];
+    statuses.forEach((s, i) => {
+      const from = (i * step).toFixed(1);
+      const to = ((i + 1) * step).toFixed(1);
+      stops.push(`${colorFor[s.cls]} ${from}deg ${to}deg`);
+    });
+    return stops.join(', ');
+  }
+
+  function formatDate(d){
+    if(!d) return '—';
+    return new Date(d + 'T00:00:00').toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'});
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function render(){
+    grid.innerHTML = '';
+    let expired = 0, soon = 0;
+
+    if(vehicles.length === 0){
+      grid.innerHTML = `
+        <div class="empty">
+          <h3>No vehicles yet</h3>
+          <p>Add your first vehicle to start tracking its registration, insurance, pollution and fitness dates.</p>
+        </div>`;
+    } else {
+      vehicles.forEach(v => {
+        const statuses = DOCS.map(d => statusFor(v[d.key]));
+        const worst = worstStatus(statuses);
+        const goodCount = statuses.filter(s => s.cls === 'good').length;
+        if(statuses.some(s => s.cls==='bad')) expired++;
+        else if(statuses.some(s => s.cls==='warn')) soon++;
+
+        const rowsHtml = DOCS.map((d, i) => `
+          <div class="doc-row">
+            <span class="doc-name">${d.label}</span>
+            <span class="doc-date">${formatDate(v[d.key])}</span>
+          </div>
+          <div class="doc-row">
+            <span class="pill ${statuses[i].cls}">${statuses[i].label}</span>
+            <span></span>
+          </div>`).join('');
+
+        const [accentA, accentB] = accentPairFor(worst.cls);
+
+        const wrap = document.createElement('div');
+        wrap.className = 'card-wrap';
+        wrap.innerHTML = `
+          <div class="card" style="--accent-a:${accentA}; --accent-b:${accentB}">
+            <div class="card-top">
+              <span class="plate">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="2" stroke="#7C56B8" stroke-width="1.6"/><path d="M6 6V4a2 2 0 012-2h8a2 2 0 012 2v2" stroke="#7C56B8" stroke-width="1.6"/></svg>
+                ${escapeHtml(v.plate)}
+              </span>
+              <div class="status-ring" style="--ring-stops:${ringGradient(statuses)}">
+                <span>${goodCount}/${statuses.length}</span>
+              </div>
+            </div>
+            <h3>${escapeHtml(v.ownerName)}</h3>
+            <div class="sub">${escapeHtml(v.vType)}</div>
+            ${rowsHtml}
+          </div>`;
+        wrap.querySelector('.card').addEventListener('click', () => openModal(v));
+        grid.appendChild(wrap);
+      });
+    }
+
+    document.getElementById('statTotal').textContent = vehicles.length;
+    document.getElementById('statSoon').textContent = soon;
+    document.getElementById('statExpired').textContent = expired;
+    document.getElementById('countLabel').textContent = vehicles.length + (vehicles.length===1 ? ' vehicle' : ' vehicles');
+  }
+
+  async function refresh(){
+    try{
+      vehicles = await apiGet();
+      render();
+      document.getElementById('lastSaved').textContent = 'Last synced ' + new Date().toLocaleString();
+    }catch(err){
+      grid.innerHTML = `<div class="error-banner">Couldn't load vehicles. ${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  const addOnlyFields = document.getElementById('addOnlyFields');
+  const registrationInput = document.getElementById('registrationDate');
+  const fitnessInput = document.getElementById('fitnessDate');
+
+  function openModal(vehicle){
+    form.reset();
+    formError.classList.remove('show');
+    if(vehicle){
+      modalTitle.textContent = 'Edit vehicle';
+      modalSub.textContent = 'Update the details below.';
+      document.getElementById('vehicleId').value = vehicle.id;
+      document.getElementById('ownerName').value = vehicle.ownerName;
+      document.getElementById('plate').value = vehicle.plate;
+      document.getElementById('vType').value = vehicle.vType;
+      registrationInput.value = vehicle.registrationDate;
+      document.getElementById('insuranceDate').value = vehicle.insuranceDate;
+      document.getElementById('pollutionDate').value = vehicle.pollutionDate;
+      fitnessInput.value = vehicle.fitnessDate;
+      deleteBtn.style.display = 'inline-block';
+      saveBtn.textContent = 'Save changes';
+      addOnlyFields.style.display = 'none';
+      registrationInput.required = false;
+      fitnessInput.required = false;
+    } else {
+      modalTitle.textContent = 'Add a vehicle';
+      modalSub.textContent = 'Fill in the details below.';
+      document.getElementById('vehicleId').value = '';
+      deleteBtn.style.display = 'none';
+      saveBtn.textContent = 'Save vehicle';
+      addOnlyFields.style.display = '';
+      registrationInput.required = true;
+      fitnessInput.required = true;
+    }
+    overlay.classList.add('open');
+  }
+
+  function closeModal(){
+    overlay.classList.remove('open');
+  }
+
+  document.getElementById('fabAdd').addEventListener('click', () => openModal(null));
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formError.classList.remove('show');
+    const id = document.getElementById('vehicleId').value;
+    const existing = id ? vehicles.find(v => v.id === id) : null;
+
+    const data = {
+      id: id || 'v_' + Date.now(),
+      ownerName: document.getElementById('ownerName').value.trim(),
+      plate: document.getElementById('plate').value.trim().toUpperCase(),
+      vType: document.getElementById('vType').value,
+      registrationDate: id ? (existing ? existing.registrationDate : '') : document.getElementById('registrationDate').value,
+      insuranceDate: document.getElementById('insuranceDate').value,
+      pollutionDate: document.getElementById('pollutionDate').value,
+      fitnessDate: id ? (existing ? existing.fitnessDate : '') : document.getElementById('fitnessDate').value
+    };
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+    try{
+      vehicles = await apiUpsert(data);
+      render();
+      document.getElementById('lastSaved').textContent = 'Last synced ' + new Date().toLocaleString();
+      closeModal();
+    }catch(err){
+      formError.textContent = err.message;
+      formError.classList.add('show');
+    }finally{
+      saveBtn.disabled = false;
+      saveBtn.textContent = id ? 'Save changes' : 'Save vehicle';
+    }
+  });
+
+  deleteBtn.addEventListener('click', async () => {
+    const id = document.getElementById('vehicleId').value;
+    if(!id) return;
+    if(!confirm('Delete this vehicle and its records?')) return;
+    deleteBtn.disabled = true;
+    try{
+      vehicles = await apiDelete(id);
+      render();
+      document.getElementById('lastSaved').textContent = 'Last synced ' + new Date().toLocaleString();
+      closeModal();
+    }catch(err){
+      formError.textContent = err.message;
+      formError.classList.add('show');
+    }finally{
+      deleteBtn.disabled = false;
+    }
+  });
+
+  refresh();
+</script>
+
+</body>
+</html>
