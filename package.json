@@ -1,0 +1,9 @@
+{
+  "name": "vault-vehicle-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vault - shared vehicle document expiry tracker with a Vercel + Upstash Redis backend",
+  "dependencies": {
+    "@upstash/redis": "^1.34.0"
+  }
+}
