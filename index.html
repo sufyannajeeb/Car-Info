@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#FFF7FB;
+    --paper:#FFFDFE;
     --panel:#FFFFFF;
     --pink-pale:#FDE3F0;
     --pink-mid:#F0A0C9;
@@ -37,9 +37,9 @@
   body{
     position:relative;
     background:
-      radial-gradient(ellipse 900px 500px at 8% 0%, rgba(240,160,201,0.28), transparent 60%),
-      radial-gradient(ellipse 800px 600px at 100% 20%, rgba(194,160,234,0.30), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 20% 100%, rgba(240,195,107,0.14), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 8% 0%, rgba(240,160,201,0.14), transparent 60%),
+      radial-gradient(ellipse 800px 600px at 100% 20%, rgba(194,160,234,0.15), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 20% 100%, rgba(240,195,107,0.07), transparent 60%),
       var(--paper);
     color:var(--ink);
     font-family:'Space Grotesk', sans-serif;
@@ -51,7 +51,7 @@
   ::selection{background:var(--lav-mid); color:#fff;}
 
   .mesh{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-  .mesh .blob{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.75; animation:drift 26s ease-in-out infinite; }
+  .mesh .blob{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.4; animation:drift 26s ease-in-out infinite; }
   .mesh .b1{width:460px;height:460px; top:-170px; right:-130px; background:radial-gradient(circle, var(--pink-hot), transparent 72%); animation-duration:24s;}
   .mesh .b2{width:420px;height:420px; top:16%; left:-180px; background:radial-gradient(circle, var(--lav-hot), transparent 72%); animation-duration:30s; animation-delay:-6s;}
   .mesh .b3{width:380px;height:380px; bottom:-150px; right:6%; background:radial-gradient(circle, var(--pink-mid), transparent 72%); animation-duration:22s; animation-delay:-11s;}
@@ -131,13 +131,13 @@
   }
   .stat-card .num{ font-size:28px; font-weight:600; line-height:1; font-family:'Newsreader', serif; }
   .stat-card .label{ font-size:12px; }
-  .stat-card.ok{ background:linear-gradient(150deg, rgba(194,160,234,.42), rgba(255,255,255,.62)); }
+  .stat-card.ok{ background:linear-gradient(150deg, rgba(194,160,234,.22), rgba(255,255,255,.88)); }
   .stat-card.ok .num{ color:var(--lav-hot); }
   .stat-card.ok .label{ color:var(--ink-soft); }
-  .stat-card.warn{ background:linear-gradient(150deg, rgba(240,195,107,.46), rgba(255,255,255,.62)); }
+  .stat-card.warn{ background:linear-gradient(150deg, rgba(240,195,107,.24), rgba(255,255,255,.88)); }
   .stat-card.warn .num{ color:var(--warn); }
   .stat-card.warn .label{ color:var(--ink-soft); }
-  .stat-card.bad{ background:linear-gradient(150deg, rgba(240,160,201,.5), rgba(255,255,255,.62)); }
+  .stat-card.bad{ background:linear-gradient(150deg, rgba(240,160,201,.26), rgba(255,255,255,.88)); }
   .stat-card.bad .num{ color:var(--pink-hot); }
   .stat-card.bad .label{ color:var(--ink-soft); }
   .scroll-hint{ display:none; align-items:center; gap:4px; font-size:11px; color:var(--ink-soft); padding-left:2px; margin-top:2px; }
@@ -152,7 +152,7 @@
   .card-wrap{ position:relative; }
   .card{
     position:relative; z-index:1;
-    background:rgba(255,255,255,.78); backdrop-filter:blur(8px);
+    background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
     border:1px solid var(--line); border-radius:22px;
     padding:20px 20px 16px;
     cursor:pointer;
@@ -479,11 +479,12 @@
   const saveBtn = document.getElementById('saveBtn');
   const formError = document.getElementById('formError');
 
+  // Only these are tracked for expiry status (ring, stats, pills).
+  // Registration (RC) is shown as plain info below — it doesn't expire on the same cycle.
   const DOCS = [
-    { key: 'registrationDate', label: 'Registration (RC)' },
-    { key: 'insuranceDate',    label: 'Insurance' },
-    { key: 'pollutionDate',    label: 'Pollution cert.' },
-    { key: 'fitnessDate',      label: 'Fitness cert.' }
+    { key: 'insuranceDate', label: 'Insurance' },
+    { key: 'pollutionDate', label: 'Pollution cert.' },
+    { key: 'fitnessDate',   label: 'Fitness cert.' }
   ];
 
   let vehicles = [];
@@ -618,6 +619,10 @@
             </div>
             <h3>${escapeHtml(v.ownerName)}</h3>
             <div class="sub">${escapeHtml(v.vType)}</div>
+            <div class="doc-row">
+              <span class="doc-name">Registration (RC)</span>
+              <span class="doc-date">${formatDate(v.registrationDate)}</span>
+            </div>
             ${rowsHtml}
           </div>`;
         wrap.querySelector('.card').addEventListener('click', () => openModal(v));
