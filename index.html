@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Vault — Vehicle Document Tracker</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#7C56B8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vault">
+<link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -657,15 +664,9 @@
       <div class="field-divider">Document expiry dates</div>
 
       <div id="addOnlyFields">
-        <div class="field-row">
-          <div class="field">
-            <label for="registrationDate">Vehicle registration (RC) expiry</label>
-            <input type="date" id="registrationDate">
-          </div>
-          <div class="field">
-            <label for="fitnessDate">Fitness certificate expiry</label>
-            <input type="date" id="fitnessDate">
-          </div>
+        <div class="field">
+          <label for="fitnessDate">Fitness certificate expiry</label>
+          <input type="date" id="fitnessDate">
         </div>
         <p class="addonly-note">Set once when a vehicle is added — not editable afterwards.</p>
       </div>
@@ -841,10 +842,6 @@
             </div>
             <h3>${escapeHtml(v.ownerName)}</h3>
             <div class="sub">${escapeHtml(v.vType)}</div>
-            <div class="doc-row">
-              <span class="doc-name">Registration (RC)</span>
-              <span class="doc-date">${formatDate(v.registrationDate)}</span>
-            </div>
             ${rowsHtml}
           </div>`;
         wrap.querySelector('.card').addEventListener('click', () => openModal(v));
@@ -869,7 +866,6 @@
   }
 
   const addOnlyFields = document.getElementById('addOnlyFields');
-  const registrationInput = document.getElementById('registrationDate');
   const fitnessInput = document.getElementById('fitnessDate');
 
   function openModal(vehicle){
@@ -882,14 +878,12 @@
       document.getElementById('ownerName').value = vehicle.ownerName;
       document.getElementById('plate').value = vehicle.plate;
       document.getElementById('vType').value = vehicle.vType;
-      registrationInput.value = vehicle.registrationDate;
       document.getElementById('insuranceDate').value = vehicle.insuranceDate;
       document.getElementById('pollutionDate').value = vehicle.pollutionDate;
       fitnessInput.value = vehicle.fitnessDate;
       deleteBtn.style.display = 'inline-block';
       saveBtn.textContent = 'Save changes';
       addOnlyFields.style.display = 'none';
-      registrationInput.required = false;
       fitnessInput.required = false;
     } else {
       modalTitle.textContent = 'Add a vehicle';
@@ -898,7 +892,6 @@
       deleteBtn.style.display = 'none';
       saveBtn.textContent = 'Save vehicle';
       addOnlyFields.style.display = '';
-      registrationInput.required = true;
       fitnessInput.required = true;
     }
     overlay.classList.add('open');
@@ -929,7 +922,6 @@
       ownerName: document.getElementById('ownerName').value.trim(),
       plate: document.getElementById('plate').value.trim().toUpperCase(),
       vType: document.getElementById('vType').value,
-      registrationDate: id ? (existing ? existing.registrationDate : '') : document.getElementById('registrationDate').value,
       insuranceDate: document.getElementById('insuranceDate').value,
       pollutionDate: document.getElementById('pollutionDate').value,
       fitnessDate: id ? (existing ? existing.fitnessDate : '') : document.getElementById('fitnessDate').value
@@ -995,6 +987,14 @@
     }
     requestAnimationFrame(frame);
   })();
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('Service Worker registered:', reg.scope))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  }
 </script>
 
 </body>

@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       const idx = vehicles.findIndex((v) => v.id === body.id);
 
       if (idx > -1) {
-        // Editing: keep the original add-only fields (registration / fitness dates)
+        // Editing: keep the original add-only fields (fitness date)
         vehicles[idx] = {
           ...vehicles[idx],
           ownerName: body.ownerName,
