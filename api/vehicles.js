@@ -1,14 +1,20 @@
-// Vercel Serverless Function: /api/vehicles
+// api/vehicles.js
 // Stores one shared JSON list of vehicles in Upstash Redis.
-// No auth — anyone who can reach this URL can read/write the list,
-// matching the "no login, anyone with the link" requirement.
+// Now requires a valid session cookie (set by /api/login) on every request.
 
 import { Redis } from '@upstash/redis';
+import { verifyToken, getCookieToken } from '../lib/session.js';
 
 const redis = Redis.fromEnv(); // reads UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN
 const KEY = 'vehicles';
 
 export default async function handler(req, res) {
+  // --- auth gate ---
+  const token = getCookieToken(req, 'vault_auth');
+  if (!verifyToken(token)) {
+    return res.status(401).json({ error: 'Not authenticated. Please sign in.' });
+  }
+
   try {
     if (req.method === 'GET') {
       const vehicles = (await redis.get(KEY)) || [];

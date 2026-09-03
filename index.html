@@ -50,38 +50,22 @@
   }
   ::selection{background:var(--lav-mid); color:#fff;}
 
-  /* ---------- Mesh / blob background ---------- */
-  .mesh{
-    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-  }
-  .mesh .blob{
-    position:absolute; border-radius:50%;
-    filter:blur(70px);
-    opacity:.75;
-    animation:drift 26s ease-in-out infinite;
-  }
+  .mesh{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .mesh .blob{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.75; animation:drift 26s ease-in-out infinite; }
   .mesh .b1{width:460px;height:460px; top:-170px; right:-130px; background:radial-gradient(circle, var(--pink-hot), transparent 72%); animation-duration:24s;}
   .mesh .b2{width:420px;height:420px; top:16%; left:-180px; background:radial-gradient(circle, var(--lav-hot), transparent 72%); animation-duration:30s; animation-delay:-6s;}
   .mesh .b3{width:380px;height:380px; bottom:-150px; right:6%; background:radial-gradient(circle, var(--pink-mid), transparent 72%); animation-duration:22s; animation-delay:-11s;}
   .mesh .b4{width:340px;height:340px; bottom:14%; left:18%; background:radial-gradient(circle, var(--lav-mid), transparent 72%); animation-duration:28s; animation-delay:-4s;}
   .mesh .b5{width:260px;height:260px; top:42%; left:46%; background:radial-gradient(circle, var(--gold-mid), transparent 72%); animation-duration:32s; animation-delay:-14s; opacity:.4;}
-  @keyframes drift{
-    0%,100%{ transform:translate(0,0) scale(1); }
-    50%{ transform:translate(24px,-30px) scale(1.08); }
-  }
+  @keyframes drift{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(24px,-30px) scale(1.08); } }
 
   .grain{
     position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.035; mix-blend-mode:multiply;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* ---------- Ambient rising floaters ---------- */
   .floaters{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
-  .floaters span{
-    position:absolute; bottom:-70px; opacity:0;
-    animation-name:rise; animation-timing-function:ease-in-out; animation-iteration-count:infinite;
-    will-change:transform, opacity;
-  }
+  .floaters span{ position:absolute; bottom:-70px; opacity:0; animation-name:rise; animation-timing-function:ease-in-out; animation-iteration-count:infinite; will-change:transform, opacity; }
   @keyframes rise{
     0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0; }
     8%{ opacity:.7; }
@@ -97,11 +81,8 @@
   .f6{left:78%; animation-duration:20s; animation-delay:-9s;}
   .f7{left:90%; animation-duration:28s; animation-delay:-20s;}
 
-  /* ---------- Header ---------- */
-  header{
-    max-width:1080px; margin:0 auto; padding:44px 20px 26px;
-    position:relative; z-index:2;
-  }
+  header{ max-width:1080px; margin:0 auto; padding:44px 20px 26px; position:relative; z-index:2; }
+  .top-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
   .eyebrow-row{
     display:inline-flex; align-items:center; gap:9px;
     color:var(--lav-hot); font-size:13px; font-weight:600;
@@ -113,6 +94,16 @@
     backdrop-filter:blur(6px);
     opacity:0; animation:riseIn .6s ease forwards;
   }
+  .logout-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--ink-soft); background:rgba(255,255,255,.6); border:1px solid var(--line);
+    padding:7px 13px; border-radius:999px; cursor:pointer;
+    opacity:0; animation:riseIn .6s ease forwards;
+  }
+  @media (hover:hover) and (pointer:fine){
+    .logout-btn:hover{ color:var(--bad); border-color:var(--bad-bg); background:var(--bad-bg); }
+  }
   h1{
     font-family:'Newsreader', serif; font-weight:500;
     font-size:clamp(30px, 6vw, 50px); line-height:1.08;
@@ -121,10 +112,7 @@
     -webkit-background-clip:text; background-clip:text; color:transparent;
     opacity:0; animation:riseIn .7s ease .08s forwards;
   }
-  .lede{
-    font-size:15.5px; color:var(--ink-soft); max-width:50ch; line-height:1.6; margin:0;
-    opacity:0; animation:riseIn .7s ease .16s forwards;
-  }
+  .lede{ font-size:15.5px; color:var(--ink-soft); max-width:50ch; line-height:1.6; margin:0; opacity:0; animation:riseIn .7s ease .16s forwards; }
   .share-note{
     margin-top:16px; font-size:12.5px; color:var(--lav-hot); font-weight:600;
     display:inline-flex; align-items:center; gap:6px;
@@ -132,12 +120,8 @@
   }
   @keyframes riseIn{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
 
-  /* ---------- Stat carousel ---------- */
   .stats-wrap{ position:relative; z-index:2; max-width:1080px; margin:6px auto 0; padding:0 20px; }
-  .stats{
-    display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x proximity;
-    padding:2px 2px 10px; -ms-overflow-style:none; scrollbar-width:none;
-  }
+  .stats{ display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x proximity; padding:2px 2px 10px; -ms-overflow-style:none; scrollbar-width:none; }
   .stats::-webkit-scrollbar{ display:none; }
   .stat-card{
     scroll-snap-align:start; flex:0 0 auto; min-width:158px;
@@ -156,21 +140,14 @@
   .stat-card.bad{ background:linear-gradient(150deg, rgba(240,160,201,.5), rgba(255,255,255,.62)); }
   .stat-card.bad .num{ color:var(--pink-hot); }
   .stat-card.bad .label{ color:var(--ink-soft); }
-  .scroll-hint{
-    display:none; align-items:center; gap:4px; font-size:11px; color:var(--ink-soft);
-    padding-left:2px; margin-top:2px;
-  }
+  .scroll-hint{ display:none; align-items:center; gap:4px; font-size:11px; color:var(--ink-soft); padding-left:2px; margin-top:2px; }
 
-  /* ---------- Grid ---------- */
   main{ max-width:1080px; margin:0 auto; padding:26px 20px 0; position:relative; z-index:2; }
   .grid-head{ display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:20px; }
   .grid-head h2{ font-family:'Newsreader', serif; font-weight:500; font-size:21px; margin:0; }
   .grid-head span{ font-size:13px; color:var(--ink-soft); }
 
-  .grid{
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
-    gap:22px; perspective:1400px;
-  }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:22px; perspective:1400px; }
 
   .card-wrap{ position:relative; }
   .card{
@@ -193,10 +170,6 @@
     background:radial-gradient(circle, var(--accent-a, var(--lav-mid)) 0%, transparent 70%);
     opacity:.22; pointer-events:none;
   }
-  /* Hover-lift only for devices with a real hover + fine pointer (mouse/trackpad).
-     On touch screens this was firing on tap and getting stuck "on" because
-     touch devices don't send a hover-off event, which read as a permanent
-     bright highlight over the card. */
   @media (hover:hover) and (pointer:fine){
     .card-wrap:hover .card{
       transform:translateY(-8px) rotateX(3deg) rotateY(-2deg) scale(1.012);
@@ -213,26 +186,15 @@
     background:var(--lav-pale); border:1px solid var(--lav-mid);
     padding:4px 10px 4px 8px; border-radius:8px;
   }
-  .status-ring{
-    position:relative; width:44px; height:44px; border-radius:50%; flex-shrink:0;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .status-ring::before{
-    content:""; position:absolute; inset:0; border-radius:50%;
-    background:conic-gradient(var(--ring-stops));
-  }
-  .status-ring::after{
-    content:""; position:absolute; inset:5px; border-radius:50%; background:var(--panel);
-  }
+  .status-ring{ position:relative; width:44px; height:44px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .status-ring::before{ content:""; position:absolute; inset:0; border-radius:50%; background:conic-gradient(var(--ring-stops)); }
+  .status-ring::after{ content:""; position:absolute; inset:5px; border-radius:50%; background:var(--panel); }
   .status-ring span{ position:relative; z-index:1; font-size:11px; font-weight:700; color:var(--ink); }
 
   .card h3{ font-family:'Newsreader', serif; font-weight:500; font-size:19px; margin:0 0 2px; }
   .card .sub{ font-size:12px; color:var(--ink-soft); margin-bottom:14px; }
 
-  .doc-row{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:9px 0; border-top:1px solid var(--line); font-size:13px;
-  }
+  .doc-row{ display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-top:1px solid var(--line); font-size:13px; }
   .doc-row .doc-name{ color:var(--ink-soft); display:flex; align-items:center; gap:6px; }
   .doc-row .doc-date{ font-weight:600; }
   .pill{ font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; white-space:nowrap; }
@@ -249,15 +211,9 @@
   .empty h3{ font-family:'Newsreader', serif; font-weight:500; font-size:21px; margin:0 0 8px; }
   .empty p{ color:var(--ink-soft); font-size:14px; margin:0 0 20px; }
 
-  .load-state{
-    grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--ink-soft); font-size:14px;
-  }
-  .error-banner{
-    grid-column:1/-1; text-align:center; padding:16px 20px; border-radius:16px;
-    background:var(--bad-bg); color:var(--bad); font-size:13px; font-weight:600;
-  }
+  .load-state{ grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--ink-soft); font-size:14px; }
+  .error-banner{ grid-column:1/-1; text-align:center; padding:16px 20px; border-radius:16px; background:var(--bad-bg); color:var(--bad); font-size:13px; font-weight:600; }
 
-  /* ---------- Floating add button ---------- */
   .fab{
     position:fixed; right:22px; bottom:calc(22px + env(safe-area-inset-bottom));
     width:60px; height:60px; border-radius:50%;
@@ -266,12 +222,9 @@
     box-shadow:var(--shadow-lift); cursor:pointer; z-index:40;
     transition:transform .15s ease;
   }
-  @media (hover:hover) and (pointer:fine){
-    .fab:hover{ transform:scale(1.06); }
-  }
+  @media (hover:hover) and (pointer:fine){ .fab:hover{ transform:scale(1.06); } }
   .fab:active{ transform:scale(0.94); }
 
-  /* ---------- Modal / bottom sheet ---------- */
   .overlay{
     position:fixed; inset:0; background:rgba(58,46,72,0.42); backdrop-filter:blur(3px);
     display:flex; align-items:center; justify-content:center; padding:20px; z-index:60;
@@ -295,9 +248,7 @@
     background:var(--lav-pale); border:none; width:32px; height:32px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--lav-deep); flex-shrink:0;
   }
-  @media (hover:hover) and (pointer:fine){
-    .close-btn:hover{ background:var(--lav-mid); color:#fff; }
-  }
+  @media (hover:hover) and (pointer:fine){ .close-btn:hover{ background:var(--lav-mid); color:#fff; } }
 
   form{ margin-top:18px; display:flex; flex-direction:column; gap:14px; }
   .field{ display:flex; flex-direction:column; gap:6px; }
@@ -307,9 +258,7 @@
     border-radius:12px; border:1px solid var(--line); background:#FFFCFE; color:var(--ink);
     outline:none; transition:border-color .15s ease, box-shadow .15s ease;
   }
-  .field input:focus, .field select:focus{
-    border-color:var(--lav-deep); box-shadow:0 0 0 3px rgba(124,86,184,0.15);
-  }
+  .field input:focus, .field select:focus{ border-color:var(--lav-deep); box-shadow:0 0 0 3px rgba(124,86,184,0.15); }
   .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .field-divider{ display:flex; align-items:center; gap:10px; margin-top:2px; color:var(--ink-soft); font-size:11.5px; }
   .field-divider::before, .field-divider::after{ content:""; flex:1; height:1px; background:var(--line); }
@@ -324,14 +273,10 @@
   }
   .btn:active{ transform:scale(0.97); }
   .btn-primary{ background:linear-gradient(120deg, var(--lav-hot), var(--pink-hot)); color:#fff; flex:1; }
-  @media (hover:hover) and (pointer:fine){
-    .btn-primary:hover{ filter:brightness(1.06); }
-  }
+  @media (hover:hover) and (pointer:fine){ .btn-primary:hover{ filter:brightness(1.06); } }
   .btn-primary:disabled{ opacity:.6; cursor:default; }
   .btn-ghost{ background:transparent; color:var(--bad); padding:12px 4px; }
-  @media (hover:hover) and (pointer:fine){
-    .btn-ghost:hover{ text-decoration:underline; }
-  }
+  @media (hover:hover) and (pointer:fine){ .btn-ghost:hover{ text-decoration:underline; } }
 
   footer{
     max-width:1080px; margin:52px auto 0; padding:0 20px 36px;
@@ -340,7 +285,6 @@
     position:relative; z-index:2;
   }
 
-  /* ---------- Mobile-first refinements ---------- */
   @media (max-width:640px){
     body{ padding-bottom:110px; }
     header{ padding:32px 16px 20px; }
@@ -350,30 +294,19 @@
     .grid{ grid-template-columns:1fr; gap:18px; }
     .field-row{ grid-template-columns:1fr; }
     .fab{ right:16px; width:56px; height:56px; }
-
-    /* Tone down the blobs/grain on small screens so the UI doesn't read
-       as a wash of bright white/pink behind the content. */
     .mesh .blob{ filter:blur(50px); opacity:.5; }
     .grain{ opacity:.02; }
-
     .card{ background:rgba(255,255,255,.9); }
     .stat-card{ backdrop-filter:none; }
-
     .overlay{ align-items:flex-end; padding:0; }
-    .modal{
-      max-width:100%; border-radius:26px 26px 0 0; padding:14px 20px calc(22px + env(safe-area-inset-bottom));
-      max-height:92vh; transform:translateY(100%);
-    }
+    .modal{ max-width:100%; border-radius:26px 26px 0 0; padding:14px 20px calc(22px + env(safe-area-inset-bottom)); max-height:92vh; transform:translateY(100%); }
     .overlay.open .modal{ transform:translateY(0); }
-    .sheet-handle{
-      display:block; width:40px; height:4px; border-radius:999px; background:var(--line);
-      margin:2px auto 14px;
-    }
+    .sheet-handle{ display:block; width:40px; height:4px; border-radius:999px; background:var(--line); margin:2px auto 14px; }
   }
 
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; animation:none !important; }
-    .eyebrow-row, h1, .lede, .share-note{ opacity:1; }
+    .eyebrow-row, h1, .lede, .share-note, .logout-btn{ opacity:1; }
   }
 </style>
 </head>
@@ -399,19 +332,25 @@
 </div>
 
 <header>
-  <div class="eyebrow-row">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path d="M3 12h18M3 12l3-6h12l3 6M3 12v6a1 1 0 001 1h1a1 1 0 001-1v-1h12v1a1 1 0 001 1h1a1 1 0 001-1v-6" stroke="#7C56B8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="7.5" cy="15.5" r="1.3" fill="#7C56B8"/>
-      <circle cx="16.5" cy="15.5" r="1.3" fill="#7C56B8"/>
-    </svg>
-    <span>Vault</span>
+  <div class="top-row">
+    <div class="eyebrow-row">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M3 12h18M3 12l3-6h12l3 6M3 12v6a1 1 0 001 1h1a1 1 0 001-1v-1h12v1a1 1 0 001 1h1a1 1 0 001-1v-6" stroke="#7C56B8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="7.5" cy="15.5" r="1.3" fill="#7C56B8"/>
+        <circle cx="16.5" cy="15.5" r="1.3" fill="#7C56B8"/>
+      </svg>
+      <span>Vault</span>
+    </div>
+    <button class="logout-btn" id="logoutBtn" title="Sign out">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Sign out
+    </button>
   </div>
   <h1>Every vehicle's paperwork, never a surprise renewal.</h1>
   <p class="lede">Keep registration, insurance, pollution and fitness certificates in one place. Add a vehicle, set its expiry dates, and Vault tells you what's due before it lapses.</p>
   <div class="share-note">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.6"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.6"/></svg>
-    Shared with anyone who has this link — there's no login.
+    Shared with anyone signed in — sign-in required, no per-user accounts.
   </div>
 </header>
 
@@ -447,7 +386,7 @@
 </main>
 
 <footer>
-  <span>Synced to a shared list — anyone with this link can view and edit it.</span>
+  <span>Synced to a shared list — anyone signed in can view and edit it.</span>
   <span id="lastSaved"></span>
 </footer>
 
@@ -531,12 +470,6 @@
 </div>
 
 <script>
-  // Vehicles are stored under this single shared key so everyone with the
-  // link sees the same list. Storage values must be strings, so the whole
-  // array is JSON-encoded.
-  const STORAGE_KEY = 'vehicles';
-  const SHARED = true;
-
   const grid = document.getElementById('grid');
   const overlay = document.getElementById('overlay');
   const form = document.getElementById('vehicleForm');
@@ -555,42 +488,40 @@
 
   let vehicles = [];
 
-  // ---------- Storage helpers ----------
-  // Reading a key that has never been set throws, rather than returning
-  // null, so an empty list is treated as "not created yet" and handled here.
-  async function loadVehicles(){
-    try{
-      const result = await window.storage.get(STORAGE_KEY, SHARED);
-      if(!result || !result.value) return [];
-      const parsed = JSON.parse(result.value);
-      return Array.isArray(parsed) ? parsed : [];
-    }catch(err){
-      return [];
-    }
-  }
-
-  async function saveVehicles(list){
-    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(list), SHARED);
-    if(!result) throw new Error('Could not save — please try again.');
-    return list;
-  }
-
+  // ---------- API helpers (talks to /api/vehicles, backed by Upstash Redis) ----------
   async function apiGet(){
-    return loadVehicles();
+    const res = await fetch('/api/vehicles');
+    if(res.status === 401){ redirectToLogin(); return []; }
+    if(!res.ok) throw new Error('Could not load vehicles.');
+    return res.json();
   }
 
   async function apiUpsert(vehicle){
-    const list = await loadVehicles();
-    const idx = list.findIndex(v => v.id === vehicle.id);
-    if(idx >= 0) list[idx] = vehicle;
-    else list.push(vehicle);
-    return saveVehicles(list);
+    const res = await fetch('/api/vehicles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(vehicle)
+    });
+    if(res.status === 401){ redirectToLogin(); throw new Error('Session expired — please sign in again.'); }
+    if(!res.ok){
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Could not save — please try again.');
+    }
+    return res.json();
   }
 
   async function apiDelete(id){
-    const list = await loadVehicles();
-    const next = list.filter(v => v.id !== id);
-    return saveVehicles(next);
+    const res = await fetch('/api/vehicles?id=' + encodeURIComponent(id), { method: 'DELETE' });
+    if(res.status === 401){ redirectToLogin(); throw new Error('Session expired — please sign in again.'); }
+    if(!res.ok){
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Could not delete — please try again.');
+    }
+    return res.json();
+  }
+
+  function redirectToLogin(){
+    window.location.href = '/login.html?next=' + encodeURIComponent(window.location.pathname);
   }
 
   function daysUntil(dateStr){
@@ -754,6 +685,11 @@
   document.getElementById('closeModal').addEventListener('click', closeModal);
   overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
   document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try{ await fetch('/api/logout', { method: 'POST' }); }catch(e){}
+    window.location.href = '/login.html';
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
